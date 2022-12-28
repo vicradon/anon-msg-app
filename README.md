@@ -1,4 +1,7 @@
 # AnonMsg🙈
+
+<img src="./public/Emoji.png" style: width="100px">
+
 ## About AnonMsg🙈
 AnonMsg is a fun and interactive social media platform that allows users to share links to ask their friends, family, and followers to send anonymous messages, and to ask questions about them in order to learn what people think of them and beyond, having fun and indepth conversations.
 
