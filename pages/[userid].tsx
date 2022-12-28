@@ -1,15 +1,9 @@
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
 import {
-  FormControl,
-  Input,
   Button,
-  Text,
-  Flex,
   Heading,
   Box,
-  Radio,
-  RadioGroup,
   Textarea,
   useToast,
   Modal,
@@ -27,21 +21,11 @@ import {
   getAuth,
   getRedirectResult,
 } from "firebase/auth";
-import { firebaseApp, firebaseDb } from "../src/utils/firebase.config";
-import normalizeEmail from "../src/utils/normalizeEmail";
-import { share } from "../src/utils/share";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  getDoc,
-  setDoc,
-  query,
-  where,
-} from "firebase/firestore";
+import { firebaseDb } from "../src/utils/firebase.config";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { useAuth } from "../src/Context/AuthContext";
 import copyToClipboard from "../src/utils/copyToClipboard";
+import Meta from "../src/Layout/Meta";
 
 export default function Message() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -78,7 +62,7 @@ export default function Message() {
 
     const userEmail = querySnapshot?.docs[0]?.data()?.email;
 
-    const newMessageRef = await addDoc(
+    await addDoc(
       collection(firebaseDb, "anonymous-msgs", userEmail, "messages"),
       {
         message: anonymousMsg,
@@ -141,27 +125,25 @@ export default function Message() {
         }
       })
       .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error?.code;
-        const errorMessage = error?.message;
-        // The email of the user's account used.
-        const email = error?.customData?.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
+        toast({
+          title: "Error",
+          description: error.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       });
-  }, [username]);
+  }, [username, toast]);
 
   return (
     <div>
-      <Head>
-        <title>Anonymous Messages App</title>
-        <meta
-          name="description"
-          content="An app that allows you to send anonymous messages to friends"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Meta
+        title={`Send guyfawks me an anonymous message`}
+        description={`Trust me I won't know you sent me this message. Confess your thoughts and feelings`}
+        image={user?.photoURL}
+        imageAlt={`${username} google profile picture`}
+        canonical={`https://anon-msg-app/vercel.app/${username}`}
+      />
 
       <Box>
         <Heading>Anonymous Message App</Heading>
@@ -171,7 +153,7 @@ export default function Message() {
             border={"3px solid #333"}
             value={anonymousMsg}
             onChange={handleInputChange}
-            placeholder="Write an anonymous message for me"
+            placeholder={`Write an anonymous message for ${username}`}
             size="sm"
           />
           <Button type="submit">Send</Button>

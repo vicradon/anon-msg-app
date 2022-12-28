@@ -22,19 +22,17 @@ import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "../src/Context/AuthContext";
 import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { firebaseApp, firebaseDb } from "../src/utils/firebase.config";
-import normalizeEmail from "../src/utils/normalizeEmail";
 import {
-  addDoc,
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
   setDoc,
   where,
 } from "firebase/firestore";
 import copyToClipboard from "../src/utils/copyToClipboard";
-import { MutatingDots } from "react-loader-spinner";
+import FullPageLoader from "../src/Components/FullPageLoader";
+import Meta from "../src/Layout/Meta";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -135,45 +133,9 @@ export default function Home() {
 
   return (
     <Box overflowY={loading ? "hidden" : "visible"}>
-      <Head>
-        <title>Anonymous Messages App</title>
-        <meta
-          name="description"
-          content="An app that allows you to send anonymous messages to friends"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Meta />
 
-      {loading && (
-        <Box
-          position="absolute"
-          top={0}
-          bottom={0}
-          left={0}
-          right={0}
-          zIndex={100}
-          bg="white"
-          display="flex"
-          flexDir={"column"}
-          alignItems="center"
-          justifyContent="center"
-          height={"100vh"}
-        >
-          <Text fontSize={"lg"}>Anon Msg App</Text>
-
-          <MutatingDots
-            height="100"
-            width="100"
-            color="#4fa94d"
-            secondaryColor="#4fa94d"
-            radius="12.5"
-            ariaLabel="mutating-dots-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </Box>
-      )}
+      {loading && <FullPageLoader />}
 
       <Box>
         {isSignedIn && (
@@ -195,6 +157,12 @@ export default function Home() {
               <Heading as="h2" size="md">
                 Your messages
               </Heading>
+
+              {anonymousMsgs.length === 0 && (
+                <Text textAlign={"center"} fontSize={"sm"}>
+                  No messages yet
+                </Text>
+              )}
 
               {anonymousMsgs.map((msg) => (
                 <Box key={msg.id}>
