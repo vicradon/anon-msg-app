@@ -3,7 +3,7 @@ const FAVICON_FOLDER = "/favicons";
 
 export default function Meta({
   title = `AnonMsg: Send that risky text to your crush or friend anonymously`,
-  description = `AnonMsg is an app that allows you to Send risky texts to your crush or friend anonymously`,
+  description = `AnonMsg allows you to Send risky texts to your crush or friend anonymously`,
   image = "https://anon-msg-app.vercel.app/thumbnail.png",
   imageAlt = "OG image AnonMsg application",
   canonical = "https://anon-msg-app.vercel.app",
@@ -44,6 +44,8 @@ export default function Meta({
       />
       <meta name="msapplication-TileColor" content="#ffffff" />
       <meta name="theme-color" content="#ffffff" />
+
+      <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
 
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />

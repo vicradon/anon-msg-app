@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import { MutatingDots } from "react-loader-spinner";
 
@@ -7,6 +7,8 @@ interface Props {}
 function FullPageLoader(props: Props) {
   const {} = props;
 
+  const { colorMode } = useColorMode();
+
   return (
     <Box
       position="absolute"
@@ -14,8 +16,8 @@ function FullPageLoader(props: Props) {
       bottom={0}
       left={0}
       right={0}
-      zIndex={100}
-      bg="white"
+      zIndex={1000}
+      bg={colorMode === "light" ? "white" : "gray.800"}
       display="flex"
       flexDir={"column"}
       alignItems="center"

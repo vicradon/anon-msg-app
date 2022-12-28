@@ -1,6 +1,8 @@
 {
   "name": "AnonMsgApp",
   "short_name": "AnonMsg",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/favicons/android-chrome-192x192.png",
@@ -24,12 +26,12 @@
     },
     {
       "src": "/favicons/safari-pinned-tab.svg",
-      "sizes": "180x180",
+      "sizes": "347x347",
       "type": "image/svg+xml"
     },
     {
       "src": "/favicons/mstile-150x150.png",
-      "sizes": "150x150",
+      "sizes": "270x270",
       "type": "image/png",
       "purpose": "maskable"
     },

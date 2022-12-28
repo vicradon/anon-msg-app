@@ -17,8 +17,10 @@ import {
   useDisclosure,
   FormLabel,
   useToast,
+  Grid,
+  Avatar,
 } from "@chakra-ui/react";
-import { FaGoogle } from "react-icons/fa";
+import { FaCopy, FaGoogle, FaShare } from "react-icons/fa";
 import { useAuth } from "../src/Context/AuthContext";
 import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { firebaseApp, firebaseDb } from "../src/utils/firebase.config";
@@ -33,6 +35,9 @@ import {
 import copyToClipboard from "../src/utils/copyToClipboard";
 import FullPageLoader from "../src/Components/FullPageLoader";
 import Meta from "../src/Layout/Meta";
+import Footer from "../src/Components/Footer";
+import { CiLogout } from "react-icons/ci";
+import ToggleThemeButton from "../src/Components/ToggleThemeButton";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -124,12 +129,25 @@ export default function Home() {
         const docSnap = await getDocs(messageRef);
 
         setAnonymousMsgs(
-          docSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          docSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
         );
       }
     };
     fetchMessages();
   }, [username, user?.email]);
+
+  const handleCopyLink = (link) => {
+    copyToClipboard(link);
+    toast({
+      title: "Link copied to clipboard!",
+      status: "success",
+      duration: 1000,
+      isClosable: true,
+    });
+  };
 
   return (
     <Box overflowY={loading ? "hidden" : "visible"}>
@@ -139,52 +157,182 @@ export default function Home() {
 
       <Box>
         {isSignedIn && (
-          <Box>
-            <Flex justifyContent={"space-between"} alignItems={"center"}>
-              <Heading>Hi {user?.displayName}</Heading>
-              <Button onClick={logout}>Logout</Button>
+          <Box padding={{ base: "2rem", lg: "2rem 5rem" }}>
+            <Flex
+              mb={"3rem"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              flexWrap={"wrap"}
+            >
+              <Flex flexDir={"column"}>
+                <Flex
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  columnGap={"1rem"}
+                  flexWrap={"wrap"}
+                  mb={"1rem"}
+                >
+                  <Avatar
+                    display={{ base: "none", lg: "block" }}
+                    name={user.displayName}
+                    src={user.photoURL}
+                  />
+                  <Heading
+                    fontWeight={"medium"}
+                    size={"lg"}
+                    mb="0.5rem"
+                    as={"h1"}
+                  >
+                    Hi {user?.displayName}
+                  </Heading>
+                </Flex>
+                {username && (
+                  <Flex alignItems={"center"} columnGap={"1rem"}>
+                    <Button
+                      size={"xs"}
+                      paddingRight={"2px"}
+                      leftIcon={<FaCopy fontSize={"10px"} />}
+                      onClick={() =>
+                        handleCopyLink(
+                          `https://anon-msg-app.vercel.app/${username}`
+                        )
+                      }
+                    ></Button>
+
+                    <Text>https://anon-msg-app.vercel.app/{username}</Text>
+                  </Flex>
+                )}
+              </Flex>
+
+              <Flex flexWrap={"wrap"} rowGap={"1rem"} columnGap={"1rem"}>
+                {!username ? (
+                  <Button
+                    bg={"#0D67FF"}
+                    colorScheme={"blue"}
+                    textColor={"white"}
+                    onClick={onOpen}
+                  >
+                    Create your username
+                  </Button>
+                ) : (
+                  <Button
+                    bg={"#0D67FF"}
+                    colorScheme={"blue"}
+                    textColor={"white"}
+                    onClick={shareLink}
+                  >
+                    <Text display={{ base: "none", lg: "block" }}>
+                      Share your link
+                    </Text>
+
+                    <Flex
+                      columnGap={"5px"}
+                      alignItems={"center"}
+                      display={{ base: "flex", lg: "none" }}
+                    >
+                      <Text>Share</Text>
+                      <FaShare />
+                    </Flex>
+                  </Button>
+                )}
+                <ToggleThemeButton />
+                <Button
+                  leftIcon={<CiLogout />}
+                  variant={"outline"}
+                  onClick={logout}
+                >
+                  <Text display={{ base: "none", lg: "block" }}>Logout</Text>
+                </Button>
+              </Flex>
             </Flex>
 
-            {!username ? (
-              <Button onClick={onOpen}>Create your username</Button>
-            ) : (
-              <Box>
-                <Button onClick={shareLink}>Share your link</Button>
-              </Box>
-            )}
-
-            <Box>
-              <Heading as="h2" size="md">
+            <Box paddingBottom={"70px"}>
+              <Heading as="h2" fontWeight={"medium"} size="md" mb={"2rem"}>
                 Your messages
               </Heading>
 
               {anonymousMsgs.length === 0 && (
-                <Text textAlign={"center"} fontSize={"sm"}>
-                  No messages yet
-                </Text>
+                <Flex
+                  height={"70vh"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  <Text textAlign={"center"} fontSize={"sm"}>
+                    Oops! 😅 No one has sent you a message. Share your profile
+                    URL and check back later again!
+                  </Text>
+                </Flex>
               )}
 
-              {anonymousMsgs.map((msg) => (
-                <Box key={msg.id}>
-                  <Text>{msg.message}</Text>
-                </Box>
-              ))}
+              <Grid
+                gridTemplateColumns={{
+                  base: "1fr",
+                  lg: "1fr 1fr",
+                }}
+                columnGap={"2rem"}
+                rowGap={"2rem"}
+              >
+                {anonymousMsgs.map((msg) => (
+                  <Grid
+                    border={"1px solid #ccc"}
+                    padding={"1rem"}
+                    borderRadius={"md"}
+                    key={msg.id}
+                    height={"200px"}
+                    width={"100%"}
+                    gridTemplateRows={"5fr 1fr"}
+                    justifySelf={"center"}
+                  >
+                    <Text>{msg.message}</Text>
+
+                    <Flex
+                      justifyContent={"space-between"}
+                      alignItems={"center"}
+                    >
+                      <Text textAlign={"right"} fontSize={"sm"}>
+                        {msg.created_at &&
+                          new Date(
+                            msg?.created_at?.seconds * 1000
+                          ).toLocaleString()}
+                      </Text>
+
+                      <Button color={"gray"} leftIcon={<FaShare />} size={"sm"}>
+                        Share
+                      </Button>
+                    </Flex>
+                  </Grid>
+                ))}
+              </Grid>
             </Box>
           </Box>
         )}
 
         {!isSignedIn && (
           <Box>
-            <Heading>Anonymous Message App</Heading>
+            <Flex padding={"1rem"} justifyContent={"flex-end"}>
+              <ToggleThemeButton />
+            </Flex>
+            <Flex
+              justifyContent={"center"}
+              alignItems={"center"}
+              height={"80vh"}
+              flexDirection={"column"}
+            >
+              <Heading fontWeight={"medium"} size={"lg"} mb="0.5rem" as={"h1"}>
+                Welcome to Anon Msg
+              </Heading>
 
-            <Button leftIcon={<FaGoogle />} onClick={handleLogin}>
-              Sign in with Google
-            </Button>
+              <Text mb={"1rem"}>Send risky texts to friends anonymously</Text>
+
+              <Button leftIcon={<FaGoogle />} onClick={handleLogin}>
+                Sign in with Google
+              </Button>
+            </Flex>
           </Box>
         )}
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent paddingBottom={"2rem"}>
           <ModalHeader>Create your username</ModalHeader>
