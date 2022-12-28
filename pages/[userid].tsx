@@ -11,6 +11,7 @@ import {
   Radio,
   RadioGroup,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import {
@@ -18,53 +19,83 @@ import {
   signInWithRedirect,
   getAuth,
   getRedirectResult,
-  onAuthStateChanged,
 } from "firebase/auth";
-import { firebaseApp } from "../src/utils/firebase.config";
+import { firebaseApp, firebaseDb } from "../src/utils/firebase.config";
 import normalizeEmail from "../src/utils/normalizeEmail";
+import { share } from "../src/utils/share";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { useAuth } from "../src/Context/AuthContext";
 
 export default function Message() {
   const router = useRouter();
-  const { userid } = router.query;
-  const [value, setValue] = useState("");
+  const [anonymousMsg, setAnonymousMsg] = useState("");
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const [stuff, setStuff] = useState(null);
+  const { user } = useAuth();
+  const userid = router.query.userid as string;
+  const toast = useToast();
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
-    setValue(inputValue);
+    setAnonymousMsg(inputValue);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const collectionRef = collection(firebaseDb, "anonymous-msgs");
+    const q = await query(collectionRef, where("username", "==", userid));
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      toast({
+        title: "Anonymous user does not exist!",
+        description:
+          "There's no such user with this username. Shey you de whine me?",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const userEmail = querySnapshot?.docs[0]?.data()?.email;
+
+    const newMessageRef = await addDoc(
+      collection(firebaseDb, "anonymous-msgs", userEmail, "messages"),
+      {
+        message: anonymousMsg,
+      }
+    );
+
+    toast({
+      title: "Message sent!",
+      description: "Your message has been sent successfully",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const provider = new GoogleAuthProvider();
 
   const handleAuth = () => {
     if (isSignedIn) {
-      console.log(navigator);
-      //   navigator["share"]({
-      //     url: `https://anon.vercel.app/${normalizeEmail(user?.email)}`,
-      //     title: "Anonymous Message App",
-      //     text: "Send an anonymous message to a friend",
-      //   });
+      share(`https://anon.vercel.app/${normalizeEmail(user?.email)}`);
     } else {
       const auth = getAuth(firebaseApp);
       signInWithRedirect(auth, provider);
     }
   };
-
-  useEffect(() => {
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      }
-      setIsSignedIn(!!user);
-    });
-  }, []);
 
   useEffect(() => {
     const auth = getAuth();
@@ -110,7 +141,7 @@ export default function Message() {
 
         <Box as="form" onSubmit={handleSubmit}>
           <Textarea
-            value={value}
+            value={anonymousMsg}
             onChange={handleInputChange}
             placeholder="Write an anonymous message for me"
             size="sm"
@@ -121,8 +152,8 @@ export default function Message() {
         <Box>
           <Heading>Thank you for sending that message</Heading>
           <Text>Now send yours</Text>
-          {JSON.stringify(stuff === undefined)}
-          <Button onClick={() => setStuff(navigator.share)}>
+
+          <Button onClick={handleAuth}>
             Trigger the JavaScript share API or send the user to the Auth screen
           </Button>
         </Box>
