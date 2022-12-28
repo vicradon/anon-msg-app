@@ -92,10 +92,22 @@ export default function Message() {
 
     const userEmail = querySnapshot?.docs[0]?.data()?.email;
 
+    const encryptedResponse = await fetch("/api/crypto/encrypt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        msg: anonymousMsg,
+      }),
+    });
+
+    const encryptedMsg = await encryptedResponse.json();
+
     await addDoc(
       collection(firebaseDb, "anonymous-msgs", userEmail, "messages"),
       {
-        message: anonymousMsg,
+        message: encryptedMsg.msg,
         created_at: new Date(),
       }
     );

@@ -126,12 +126,24 @@ export default function Home() {
 
         const docSnap = await getDocs(messageRef);
 
-        setAnonymousMsgs(
-          docSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-        );
+        const messages = docSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const decryptedResponse = await fetch("/api/crypto/decrypt", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            msgs: messages,
+          }),
+        });
+
+        const decryptedMsgs = await decryptedResponse.json();
+        console.log(decryptedMsgs.messages);
+        setAnonymousMsgs(decryptedMsgs.messages);
       }
     };
     fetchMessages();
