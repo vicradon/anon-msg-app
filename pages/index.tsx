@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
   FormControl,
   Input,
@@ -31,6 +31,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
+import { useScreenshot } from "use-react-screenshot";
 import copyToClipboard from "../src/utils/copyToClipboard";
 import FullPageLoader from "../src/Components/FullPageLoader";
 import Meta from "../src/Layout/Meta";
@@ -158,6 +159,34 @@ export default function Home() {
     });
   };
 
+  const refs = useRef([]);
+  const [image, takeScreenshot] = useScreenshot();
+
+  const handleShareMsg = async (theRef) => {
+    const base64Text = await takeScreenshot(theRef);
+
+    const blob = await fetch(base64Text).then((res) => res.blob());
+    const imageFile = new File([blob], "anonymous-message.png", {
+      type: blob.type,
+    });
+
+    if (navigator.share) {
+      await navigator.share({
+        title: "Anonymous Message",
+        text: "Check out this anonymous message I received",
+        files: [imageFile],
+      });
+    } else {
+      copyToClipboard(image);
+      toast({
+        title: "Image copied to clipboard!",
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Box overflowY={loading ? "hidden" : "visible"}>
       <Meta />
@@ -281,7 +310,7 @@ export default function Home() {
                 columnGap={"2rem"}
                 rowGap={"2rem"}
               >
-                {anonymousMsgs.map((msg) => (
+                {anonymousMsgs.map((msg, index) => (
                   <Grid
                     border={"1px solid #ccc"}
                     padding={"1rem"}
@@ -291,6 +320,9 @@ export default function Home() {
                     width={"100%"}
                     gridTemplateRows={"5fr 1fr"}
                     justifySelf={"center"}
+                    ref={(el) => {
+                      refs.current[index] = el;
+                    }}
                   >
                     <Text>{msg.message}</Text>
 
@@ -305,7 +337,12 @@ export default function Home() {
                           ).toLocaleString()}
                       </Text>
 
-                      <Button color={"gray"} leftIcon={<FaShare />} size={"sm"}>
+                      <Button
+                        onClick={() => handleShareMsg(refs.current[index])}
+                        color={"gray"}
+                        leftIcon={<FaShare />}
+                        size={"sm"}
+                      >
                         Share
                       </Button>
                     </Flex>
