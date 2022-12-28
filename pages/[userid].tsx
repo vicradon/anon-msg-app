@@ -108,6 +108,7 @@ export default function Message() {
       collection(firebaseDb, "anonymous-msgs", userEmail, "messages"),
       {
         message: encryptedMsg.msg,
+        iv: encryptedMsg.iv,
         created_at: new Date(),
       }
     );

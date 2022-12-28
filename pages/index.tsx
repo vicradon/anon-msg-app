@@ -142,7 +142,6 @@ export default function Home() {
         });
 
         const decryptedMsgs = await decryptedResponse.json();
-        console.log(decryptedMsgs.messages);
         setAnonymousMsgs(decryptedMsgs.messages);
       }
     };
