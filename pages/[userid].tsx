@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FormControl,
   Input,
@@ -12,6 +12,13 @@ import {
   RadioGroup,
   Textarea,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import {
@@ -34,12 +41,13 @@ import {
   where,
 } from "firebase/firestore";
 import { useAuth } from "../src/Context/AuthContext";
+import copyToClipboard from "../src/utils/copyToClipboard";
 
 export default function Message() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const [anonymousMsg, setAnonymousMsg] = useState("");
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const { user } = useAuth();
+  const { isSignedIn, user, username } = useAuth();
   const userid = router.query.userid as string;
   const toast = useToast();
 
@@ -77,22 +85,49 @@ export default function Message() {
       }
     );
 
-    toast({
-      title: "Message sent!",
-      description: "Your message has been sent successfully",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+    if (!isSignedIn) {
+      onOpen();
+    } else {
+      toast({
+        title: "Message sent!",
+        description: "Your message has been sent successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+
+    setAnonymousMsg("");
   };
 
   const provider = new GoogleAuthProvider();
 
-  const handleAuth = () => {
+  const handleLinkShare = useCallback(async () => {
+    const url = `https://anon-msg-app.vercel.app/${username}`;
+
+    copyToClipboard(`Send me and anonymous message and I won't know\n${url}`);
+
+    toast({
+      title: "Link copied to clipboard!",
+      status: "success",
+      duration: 1000,
+      isClosable: true,
+    });
+
+    if (navigator.share) {
+      await navigator.share({
+        title: "Send me an anonymous message",
+        text: "Send an anonymous message 😉 to me and I won't know. 🙈",
+        url,
+      });
+    }
+  }, [username, toast]);
+
+  const handleAuth = async () => {
     if (isSignedIn) {
-      share(`https://anon.vercel.app/${normalizeEmail(user?.email)}`);
+      await handleLinkShare();
     } else {
-      const auth = getAuth(firebaseApp);
+      const auth = getAuth();
       signInWithRedirect(auth, provider);
     }
   };
@@ -101,17 +136,9 @@ export default function Message() {
     const auth = getAuth();
     getRedirectResult(auth)
       .then((result) => {
-        // This gives you a Google Access Token. You can use it to access Google APIs.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-
-        // The signed-in user info.
-        const user = result.user;
-        navigator.share({
-          url: `https://anon.vercel.app/${normalizeEmail(user?.email)}`,
-          title: "Anonymous Message App",
-          text: "Send an anonymous message to a friend",
-        });
+        if (result?.user) {
+          window.location.href = "/";
+        }
       })
       .catch((error) => {
         // Handle Errors here.
@@ -123,7 +150,7 @@ export default function Message() {
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
       });
-  }, []);
+  }, [username]);
 
   return (
     <div>
@@ -141,6 +168,7 @@ export default function Message() {
 
         <Box as="form" onSubmit={handleSubmit}>
           <Textarea
+            border={"3px solid #333"}
             value={anonymousMsg}
             onChange={handleInputChange}
             placeholder="Write an anonymous message for me"
@@ -148,16 +176,20 @@ export default function Message() {
           />
           <Button type="submit">Send</Button>
         </Box>
-
-        <Box>
-          <Heading>Thank you for sending that message</Heading>
-          <Text>Now send yours</Text>
-
-          <Button onClick={handleAuth}>
-            Trigger the JavaScript share API or send the user to the Auth screen
-          </Button>
-        </Box>
       </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent paddingBottom={"2rem"}>
+          <ModalHeader>Thank you for sending that message</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Box>
+              <Button onClick={handleAuth}>Now send yours</Button>
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

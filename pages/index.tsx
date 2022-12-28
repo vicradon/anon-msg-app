@@ -12,13 +12,13 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   useDisclosure,
   FormLabel,
   useToast,
 } from "@chakra-ui/react";
+import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "../src/Context/AuthContext";
 import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { firebaseApp, firebaseDb } from "../src/utils/firebase.config";
@@ -33,10 +33,12 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
+import copyToClipboard from "../src/utils/copyToClipboard";
+import { MutatingDots } from "react-loader-spinner";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isSignedIn, user, username } = useAuth();
+  const { isSignedIn, user, username, setUsername, loading } = useAuth();
   const provider = new GoogleAuthProvider();
   const [usernameInput, setUsernameInput] = useState("");
   const [anonymousMsgs, setAnonymousMsgs] = useState([]);
@@ -51,9 +53,8 @@ export default function Home() {
 
   const shareLink = async () => {
     const url = `https://anon-msg-app.vercel.app/${username}`;
-    navigator.clipboard.writeText(
-      `Send me and anonymous message and I won't know\n${url}`
-    );
+
+    copyToClipboard(`Send me and anonymous message and I won't know\n${url}`);
 
     toast({
       title: "Link copied to clipboard!",
@@ -62,11 +63,13 @@ export default function Home() {
       isClosable: true,
     });
 
-    await navigator.share({
-      title: "Send me an anonymous message",
-      text: "Send an anonymous message 😉 to me and I won't know. 🙈",
-      url,
-    });
+    if (navigator.share) {
+      await navigator.share({
+        title: "Send me an anonymous message",
+        text: "Send an anonymous message 😉 to me and I won't know. 🙈",
+        url,
+      });
+    }
   };
 
   const handleChooseUsername = async (event) => {
@@ -88,13 +91,10 @@ export default function Home() {
         isClosable: true,
       });
     } else {
-      const docRef = await setDoc(
-        doc(firebaseDb, "anonymous-msgs", user.email),
-        {
-          email: user.email,
-          username: usernameInput,
-        }
-      );
+      await setDoc(doc(firebaseDb, "anonymous-msgs", user.email), {
+        email: user.email,
+        username: usernameInput,
+      });
 
       toast({
         title: "Username set successfully!",
@@ -103,6 +103,7 @@ export default function Home() {
         duration: 3000,
         isClosable: true,
       });
+      setUsername(usernameInput);
       onClose();
     }
   };
@@ -114,14 +115,6 @@ export default function Home() {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      // const anonymousMsgsRef = collection(firebaseDb, "anonymous-msgs");
-
-      // const q = await query(
-      //   anonymousMsgsRef,
-      //   where("username", "==", username)
-      // );
-      // const querySnapshot = await getDocs(q);
-
       if (user?.email) {
         const messageRef = collection(
           firebaseDb,
@@ -141,7 +134,7 @@ export default function Home() {
   }, [username, user?.email]);
 
   return (
-    <div>
+    <Box overflowY={loading ? "hidden" : "visible"}>
       <Head>
         <title>Anonymous Messages App</title>
         <meta
@@ -150,6 +143,37 @@ export default function Home() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      {loading && (
+        <Box
+          position="absolute"
+          top={0}
+          bottom={0}
+          left={0}
+          right={0}
+          zIndex={100}
+          bg="white"
+          display="flex"
+          flexDir={"column"}
+          alignItems="center"
+          justifyContent="center"
+          height={"100vh"}
+        >
+          <Text fontSize={"lg"}>Anon Msg App</Text>
+
+          <MutatingDots
+            height="100"
+            width="100"
+            color="#4fa94d"
+            secondaryColor="#4fa94d"
+            radius="12.5"
+            ariaLabel="mutating-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </Box>
+      )}
 
       <Box>
         {isSignedIn && (
@@ -185,7 +209,9 @@ export default function Home() {
           <Box>
             <Heading>Anonymous Message App</Heading>
 
-            <Button onClick={handleLogin}>Login</Button>
+            <Button leftIcon={<FaGoogle />} onClick={handleLogin}>
+              Sign in with Google
+            </Button>
           </Box>
         )}
       </Box>
@@ -216,6 +242,6 @@ export default function Home() {
           </ModalBody>
         </ModalContent>
       </Modal>
-    </div>
+    </Box>
   );
 }

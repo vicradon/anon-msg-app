@@ -12,7 +12,10 @@ type ContextProps = {
   setUser: React.Dispatch<React.SetStateAction<any>>;
   isSignedIn: boolean;
   username: string;
+  setUsername: React.Dispatch<React.SetStateAction<any>>;
   setIsSignedIn: React.Dispatch<React.SetStateAction<any>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<any>>;
 };
 
 const AuthContext = createContext<ContextProps>({
@@ -20,7 +23,10 @@ const AuthContext = createContext<ContextProps>({
   setUser: null,
   isSignedIn: false,
   username: "",
+  setUsername: null,
   setIsSignedIn: null,
+  loading: true,
+  setLoading: null,
 });
 
 function AuthProvider(props: Props) {
@@ -28,8 +34,10 @@ function AuthProvider(props: Props) {
   const [user, setUser] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const auth = getAuth();
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -41,13 +49,23 @@ function AuthProvider(props: Props) {
           setUsername(docSnap.data()?.username);
         }
       }
+      setLoading(false);
       setIsSignedIn(!!user);
     });
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, username, setUser, isSignedIn, setIsSignedIn }}
+      value={{
+        user,
+        username,
+        setUser,
+        isSignedIn,
+        setIsSignedIn,
+        setUsername,
+        loading,
+        setLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
