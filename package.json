@@ -12,14 +12,17 @@
     "@chakra-ui/react": "2.0.0",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@vercel/og": "^0.0.21",
     "firebase": "^9.15.0",
     "framer-motion": "^6",
+    "html2canvas": "^1.4.1",
     "next": "13.1.1",
     "openai": "^3.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
-    "react-loader-spinner": "^5.3.4"
+    "react-loader-spinner": "^5.3.4",
+    "use-react-screenshot": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "18.11.18",

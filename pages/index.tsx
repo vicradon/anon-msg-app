@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import {
   FormControl,
@@ -35,7 +34,6 @@ import {
 import copyToClipboard from "../src/utils/copyToClipboard";
 import FullPageLoader from "../src/Components/FullPageLoader";
 import Meta from "../src/Layout/Meta";
-import Footer from "../src/Components/Footer";
 import { CiLogout } from "react-icons/ci";
 import ToggleThemeButton from "../src/Components/ToggleThemeButton";
 
