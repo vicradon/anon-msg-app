@@ -1,24 +1,11 @@
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
-import { useAuth } from "Context/AuthContext";
-import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
-import React from "react";
-import { FaGoogle } from "react-icons/fa";
+import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import ToggleThemeButton from "./ToggleThemeButton";
+import Authenticator from "./Authenticator";
 
 interface Props {}
 
 function UnauthenticatedLandingView(props: Props) {
   const {} = props;
-
-  const { isSignedIn } = useAuth();
-  const provider = new GoogleAuthProvider();
-
-  const handleLogin = () => {
-    if (!isSignedIn) {
-      const auth = getAuth();
-      signInWithRedirect(auth, provider);
-    }
-  };
 
   return (
     <Box>
@@ -37,9 +24,7 @@ function UnauthenticatedLandingView(props: Props) {
 
         <Text mb={"1rem"}>Send risky texts to friends anonymously</Text>
 
-        <Button leftIcon={<FaGoogle />} onClick={handleLogin}>
-          Sign in with Google
-        </Button>
+        <Authenticator />
       </Flex>
     </Box>
   );

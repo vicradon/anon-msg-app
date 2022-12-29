@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Heading, Box, useDisclosure, Grid } from "@chakra-ui/react";
+import { Heading, Box, useDisclosure, Grid, useToast } from "@chakra-ui/react";
 import { useAuth } from "../src/Context/AuthContext";
 import { firebaseDb } from "../src/utils/firebase.config";
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import FullPageLoader from "../src/Components/FullPageLoader";
 import Meta from "../src/Layout/Meta";
 import MessageCard from "../src/Components/MessageCard";
@@ -11,11 +11,13 @@ import ChooseUsernameModal from "Components/ChooseUsernameModal";
 import NoMessagesView from "Components/NoMessagesView";
 import Header from "Components/Header";
 import { createRef } from "react";
+import VerifyEmailView from "Components/VerifyEmailView";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isSignedIn, user, username, setUsername, loading } = useAuth();
+  const { isSignedIn, user, username, loading } = useAuth();
   const [anonymousMsgs, setAnonymousMsgs] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -27,30 +29,40 @@ export default function Home() {
           "messages"
         );
 
-        const q = query(messagesRef, orderBy("created_at", "desc"));
-        const docSnap = await getDocs(q);
+        try {
+          const q = query(messagesRef, orderBy("created_at", "desc"));
+          const docSnap = await getDocs(q);
 
-        const messages = docSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+          const messages = docSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
 
-        const decryptedResponse = await fetch("/api/crypto/decrypt", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            msgs: messages,
-          }),
-        });
+          const decryptedResponse = await fetch("/api/crypto/decrypt", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              msgs: messages,
+            }),
+          });
 
-        const decryptedMsgs = await decryptedResponse.json();
-        setAnonymousMsgs(decryptedMsgs.messages);
+          const decryptedMsgs = await decryptedResponse.json();
+          setAnonymousMsgs(decryptedMsgs.messages);
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: error.message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
       }
     };
     fetchMessages();
-  }, [username, user?.email]);
+  }, [username, user?.email, toast]);
 
   const refs = useRef([]);
 
@@ -61,7 +73,7 @@ export default function Home() {
       {loading && <FullPageLoader />}
 
       <Box>
-        {isSignedIn && (
+        {isSignedIn && user.emailVerified && (
           <Box padding={{ base: "2rem", lg: "2rem 5rem" }}>
             <Header onOpen={onOpen} />
 
@@ -89,6 +101,8 @@ export default function Home() {
             </Box>
           </Box>
         )}
+
+        {isSignedIn && !user.emailVerified && <VerifyEmailView />}
 
         {!isSignedIn && <UnauthenticatedLandingView />}
       </Box>
