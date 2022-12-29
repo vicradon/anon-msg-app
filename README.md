@@ -1,5 +1,5 @@
 # AnonMsg🙈
-![Logoplaceholder](https://github.com/Devbysteph/anon-msg-app/blob/main/public/Logo%20placeholder.png) 
+![Logoplaceholder](./public/Logo%20placeholder.png) 
 
 ## About AnonMsg🙈
 AnonMsg is a fun and interactive social media platform that allows users to share links to ask their friends, family, and followers to send anonymous messages, and to ask questions about them in order to learn what people think of them and beyond, having fun and indepth conversations.
@@ -23,15 +23,15 @@ You may check out how it works and [get started](https://anon-msg-app.vercel.app
 Go to [AnonMsg🙈](https://anon-msg-app.vercel.app/) to get started
 ## WebApp Screenshots
 ### Web view
-![light screen](https://github.com/Devbysteph/anon-msg-app/blob/main/public/light%20screen.PNG)
-![dark screen](https://github.com/Devbysteph/anon-msg-app/blob/main/public/dark%20screen.PNG)
+![light screen](./public/light%20screen.PNG)
+![dark screen](./public/dark%20screen.PNG)
 ### Mobile view
-![mobile](https://github.com/Devbysteph/anon-msg-app/blob/main/public/mobile.png)
+![mobile](./public/mobile.png)
 
 ## Technology
 
 Visit the [tech doc](./technology_readme.md) to learn about the technologies used in this project.
 ## Contribute
 To contribute, 
-Make sure you fork the repo and give it a star    
-Clone the repo and send a pull request
+  Make sure you fork the repo and give it a star    
+  Clone the repo and send a pull request
