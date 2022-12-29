@@ -31,12 +31,14 @@ import copyToClipboard from "../src/utils/copyToClipboard";
 import Meta from "../src/Layout/Meta";
 import Footer from "../src/Components/Footer";
 import ToggleThemeButton from "../src/Components/ToggleThemeButton";
+import Authenticator from "Components/Authenticator";
 
 export default function Message() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const [anonymousMsg, setAnonymousMsg] = useState("");
   const { isSignedIn, user, username } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const userid = router.query.userid as string;
   const toast = useToast();
 
@@ -52,6 +54,7 @@ export default function Message() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     if (anonymousMsg.trim().length === 0) {
       toast({
@@ -61,6 +64,7 @@ export default function Message() {
         duration: 3000,
         isClosable: true,
       });
+      setIsSubmitting(false);
       return;
     } else if (anonymousMsg.trim().length > MAX_CHARACTER_COUNT) {
       toast({
@@ -70,6 +74,7 @@ export default function Message() {
         duration: 3000,
         isClosable: true,
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -112,6 +117,8 @@ export default function Message() {
         created_at: new Date(),
       }
     );
+
+    setIsSubmitting(false);
 
     if (!isSignedIn) {
       onOpen();
@@ -222,7 +229,7 @@ export default function Message() {
             display={"block"}
             value={anonymousMsg}
             onChange={handleInputChange}
-            placeholder={`Write an anonymous message for ${username}`}
+            placeholder={`Write an anonymous message for ${userid}`}
             height={"200px"}
             mb={"1rem"}
           />
@@ -236,6 +243,8 @@ export default function Message() {
               bg={"#0D67FF"}
               width={"100px"}
               type="submit"
+              isLoading={isSubmitting}
+              loadingText="Sending"
             >
               Send
             </Button>
@@ -245,15 +254,14 @@ export default function Message() {
 
       <Footer />
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent paddingBottom={"2rem"}>
-          <ModalHeader>Thank you for sending that message</ModalHeader>
+          <ModalHeader>{userid} has received your message</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Box>
-              <Button onClick={handleAuth}>Now send yours</Button>
-            </Box>
+            <Text mb={"1.5rem"}>Now create your account</Text>
+            <Authenticator isNewUser />
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -7,11 +7,9 @@ import {
   Avatar,
 } from "@chakra-ui/react";
 import { useAuth } from "Context/AuthContext";
-import { getAuth } from "firebase/auth";
-import { CiLogout } from "react-icons/ci";
 import { FaCopy, FaShare } from "react-icons/fa";
 import copyToClipboard from "utils/copyToClipboard";
-import { firebaseApp } from "utils/firebase.config";
+import LogoutButton from "./LogoutButton";
 import ToggleThemeButton from "./ToggleThemeButton";
 
 interface Props {
@@ -54,11 +52,6 @@ function Header(props: Props) {
     }
   };
 
-  const logout = async () => {
-    const auth = getAuth(firebaseApp);
-    await auth.signOut();
-  };
-
   return (
     <Flex
       mb={"3rem"}
@@ -69,7 +62,6 @@ function Header(props: Props) {
     >
       <Flex flexDir={"column"}>
         <Flex
-          justifyContent={"center"}
           alignItems={"center"}
           columnGap={"1rem"}
           flexWrap={"wrap"}
@@ -130,9 +122,7 @@ function Header(props: Props) {
           </Button>
         )}
         <ToggleThemeButton />
-        <Button leftIcon={<CiLogout />} variant={"outline"} onClick={logout}>
-          <Text display={{ base: "none", lg: "block" }}>Logout</Text>
-        </Button>
+        <LogoutButton />
       </Flex>
     </Flex>
   );

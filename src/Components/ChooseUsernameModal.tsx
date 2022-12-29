@@ -89,7 +89,9 @@ function ChooseUsernameModal(props: Props) {
               <Input
                 required
                 value={usernameInput}
-                onChange={({ target }) => setUsernameInput(target.value)}
+                onChange={({ target }) =>
+                  setUsernameInput(target.value.trim().toLowerCase())
+                }
                 placeholder="Choose a username"
               />
             </FormControl>
