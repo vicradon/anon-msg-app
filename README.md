@@ -23,10 +23,10 @@ You may check out how it works and [get started](https://anon-msg-app.vercel.app
 Go to [AnonMsg🙈](https://anon-msg-app.vercel.app/) to get started
 ## WebApp Screenshots
 ### Web view
-![light screen](https://user-images.githubusercontent.com/67132776/209936552-1d7df681-be55-4983-963a-6dcf0afd4e28.PNG)
-![dark screen](https://user-images.githubusercontent.com/67132776/209936575-93e6111f-e7bd-4ed2-9d51-229cede83476.PNG)
+![light screen](https://github.com/Devbysteph/anon-msg-app/blob/main/public/light%20screen.PNG)
+![dark screen](https://github.com/Devbysteph/anon-msg-app/blob/main/public/dark%20screen.PNG)
 ### Mobile view
-![mobile](https://user-images.githubusercontent.com/67132776/209943752-a84f26ad-02ed-4d9a-b381-18476760ede8.png)
+![mobile](https://github.com/Devbysteph/anon-msg-app/blob/main/public/mobile.png)
 
 ## Technology
 
