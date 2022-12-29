@@ -1,34 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AnonMsg🙈
+![Logoplaceholder](./public/Logo%20placeholder.png) 
 
-## Getting Started
+## About AnonMsg🙈
+AnonMsg is a fun and interactive social media platform that allows users to share links to ask their friends, family, and followers to send anonymous messages, and to ask questions about them in order to learn what people think of them and beyond, having fun and indepth conversations.
 
-First, run the development server:
+Users can quickly share their link and begin reading messags as they get responses.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+In order for users' connections and followers to participate in anonymous messaging, AnonMsg makes it incredibly simple for users to post their link on other social networking sites as well.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You may check out how it works and [get started](https://anon-msg-app.vercel.app/) for free if you don't already have an account.
+## Features
+1. Anonymity 👓
+>When you send someone a secret message, our platform protects your privacy to keep you anonymous. You remain anonymous unless you decide to expose your true identity.
+2. Simple to Use 💫
+>We are continually improving the platform, to make AnonMsg🙈 as user-friendly as possible.To get started right now, all you need to do is to go to [AnonMsg🙈](https://anon-msg-app.vercel.app/)and enter your login and password. 
+3. Secure & Private 🔒
+>With AnonMsg🙈 messages are secured with aes cipher encryption and your account is secure.
+4. 100% Free 🆓
+>Access all of AnonMsg🙈 features for free without paying a penny.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## View 
+Go to [AnonMsg🙈](https://anon-msg-app.vercel.app/) to get started
+## WebApp Screenshots
+### Web view
+![light screen](./public/light%20screen.PNG)
+![dark screen](./public/dark%20screen.PNG)
+### Mobile view
+![mobile](./public/mobile.png)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Technology
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Visit the [tech doc](./technology_readme.md) to learn about the technologies used in this project.
+## Contribute
+To contribute, 
+  Make sure you fork the repo and give it a star    
+  Clone the repo and send a pull request
