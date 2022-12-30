@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/**/*.ts": {
+    "api/**/generate-image.ts": {
       "excludeFiles": "{+(.now|_next|node_modules|public|assets|components|pages)/**,yarn.lock,README.md}"
     }
   }
