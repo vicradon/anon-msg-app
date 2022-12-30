@@ -49,7 +49,6 @@ export default async function handler(req: NextRequest) {
           backgroundColor: isDarkTheme ? "#000000" : "#ffffff",
           display: "flex",
           position: "relative",
-          borderRadius: "5px",
         }}
       >
         <img

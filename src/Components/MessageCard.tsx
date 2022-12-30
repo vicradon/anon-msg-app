@@ -6,7 +6,7 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { FaShare } from "react-icons/fa";
 import { AnonymousMessage } from "utils/types";
 
@@ -18,8 +18,10 @@ function MessageCard(props: Props) {
   const { msg } = props;
   const toast = useToast();
   const { colorMode } = useColorMode();
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const handleShareMsg = async () => {
+    setGeneratingImage(true);
     const generatedImageResponse = await fetch("/api/generate-image", {
       method: "POST",
       headers: {
@@ -32,6 +34,7 @@ function MessageCard(props: Props) {
     });
 
     const generatedImageBlob = await generatedImageResponse.blob();
+    setGeneratingImage(false);
 
     try {
       const imageFile = new File(
@@ -89,7 +92,12 @@ function MessageCard(props: Props) {
             new Date(msg?.created_at?.seconds * 1000).toLocaleDateString()}
         </Text>
 
-        <Button onClick={() => handleShareMsg()} color={"gray"} size={"sm"}>
+        <Button
+          isLoading={generatingImage}
+          onClick={() => handleShareMsg()}
+          color={"gray"}
+          size={"sm"}
+        >
           <Flex alignItems={"center"} columnGap={"5px"}>
             <FaShare />
             <Text>Share</Text>
