@@ -76,7 +76,7 @@ function MessageCard(props: Props) {
       border={"1px solid #ccc"}
       padding={"1rem"}
       borderRadius={"md"}
-      height={"200px"}
+      height={{ base: "350px", sm: "200px" }}
       width={"100%"}
       gridTemplateRows={"5fr 1fr"}
       justifySelf={"center"}
