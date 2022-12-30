@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Heading, Box, useDisclosure, Grid, useToast } from "@chakra-ui/react";
 import { useAuth } from "../src/Context/AuthContext";
 import { firebaseDb } from "../src/utils/firebase.config";
@@ -10,7 +10,6 @@ import UnauthenticatedLandingView from "Components/UnauthenticatedLandingView";
 import ChooseUsernameModal from "Components/ChooseUsernameModal";
 import NoMessagesView from "Components/NoMessagesView";
 import Header from "Components/Header";
-import { createRef } from "react";
 import VerifyEmailView from "Components/VerifyEmailView";
 
 export default function Home() {
@@ -64,8 +63,6 @@ export default function Home() {
     fetchMessages();
   }, [username, user?.email, toast]);
 
-  const refs = useRef([]);
-
   return (
     <Box overflowY={loading ? "hidden" : "visible"}>
       <Meta />
@@ -92,11 +89,9 @@ export default function Home() {
                 columnGap={"2rem"}
                 rowGap={"2rem"}
               >
-                {anonymousMsgs.map((msg) => {
-                  const ref = createRef();
-                  refs.current.push(ref);
-                  return <MessageCard key={msg.id} msg={msg} innerRef={ref} />;
-                })}
+                {anonymousMsgs.map((msg) => (
+                  <MessageCard key={msg.id} msg={msg} />
+                ))}
               </Grid>
             </Box>
           </Box>

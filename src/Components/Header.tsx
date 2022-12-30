@@ -87,7 +87,9 @@ function Header(props: Props) {
               }
             ></Button>
 
-            <Text>https://anon-msg-app.vercel.app/{username}</Text>
+            <Text fontSize={{ base: "0.7rem", lg: "1rem" }}>
+              https://anon-msg-app.vercel.app/{username}
+            </Text>
           </Flex>
         )}
       </Flex>

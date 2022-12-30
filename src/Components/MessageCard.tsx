@@ -1,31 +1,46 @@
-import { Button, Flex, Grid, Text, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Grid,
+  Text,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 import React from "react";
 import { FaShare } from "react-icons/fa";
 import { AnonymousMessage } from "utils/types";
-import { toPng } from "html-to-image";
 
 interface Props {
-  innerRef?: any;
   msg: AnonymousMessage;
 }
 
 function MessageCard(props: Props) {
-  const { innerRef, msg } = props;
+  const { msg } = props;
   const toast = useToast();
+  const { colorMode } = useColorMode();
 
-  const handleShareMsg = async (theRef) => {
-    const footerSection = theRef.current.lastChild;
-    const lastChild = footerSection.lastChild;
-    footerSection.removeChild(footerSection.lastChild);
+  const handleShareMsg = async () => {
+    const generatedImageResponse = await fetch("/api/generate-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: msg.message,
+        theme: colorMode,
+      }),
+    });
+
+    const generatedImageBlob = await generatedImageResponse.blob();
 
     try {
-      const base64Text = await toPng(theRef.current);
-      footerSection.appendChild(lastChild);
-
-      const blob = await fetch(base64Text).then((res) => res.blob());
-      const imageFile = new File([blob], "anonymous-message.png", {
-        type: blob.type,
-      });
+      const imageFile = new File(
+        [generatedImageBlob],
+        "anonymous-message.png",
+        {
+          type: generatedImageBlob.type,
+        }
+      );
 
       if (navigator.share) {
         await navigator.share({
@@ -34,7 +49,9 @@ function MessageCard(props: Props) {
           files: [imageFile],
         });
       } else if (navigator.clipboard) {
-        navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        navigator.clipboard.write([
+          new ClipboardItem({ "image/png": generatedImageBlob }),
+        ]);
         toast({
           title: "Image copied to clipboard!",
           status: "success",
@@ -63,21 +80,16 @@ function MessageCard(props: Props) {
       width={"100%"}
       gridTemplateRows={"5fr 1fr"}
       justifySelf={"center"}
-      ref={innerRef}
     >
       <Text>{msg.message}</Text>
 
       <Flex justifyContent={"space-between"} alignItems={"center"}>
         <Text textAlign={"right"} fontSize={"sm"}>
           {msg.created_at &&
-            new Date(msg?.created_at?.seconds * 1000).toLocaleString()}
+            new Date(msg?.created_at?.seconds * 1000).toLocaleDateString()}
         </Text>
 
-        <Button
-          onClick={() => handleShareMsg(innerRef)}
-          color={"gray"}
-          size={"sm"}
-        >
+        <Button onClick={() => handleShareMsg()} color={"gray"} size={"sm"}>
           <Flex alignItems={"center"} columnGap={"5px"}>
             <FaShare />
             <Text>Share</Text>

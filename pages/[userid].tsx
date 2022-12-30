@@ -1,5 +1,4 @@
-import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Heading,
@@ -17,21 +16,16 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import {
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getAuth,
-  getRedirectResult,
-} from "firebase/auth";
+import { getAuth, getRedirectResult } from "firebase/auth";
 import NextLink from "next/link";
 import { firebaseDb } from "../src/utils/firebase.config";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { useAuth } from "../src/Context/AuthContext";
-import copyToClipboard from "../src/utils/copyToClipboard";
 import Meta from "../src/Layout/Meta";
 import Footer from "../src/Components/Footer";
 import ToggleThemeButton from "../src/Components/ToggleThemeButton";
 import Authenticator from "Components/Authenticator";
+import useWindowSize from "utils/hooks/useWindowSize";
 
 export default function Message() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -40,6 +34,8 @@ export default function Message() {
   const { isSignedIn, user, username } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userid = router.query.userid as string;
+  const windowSize = useWindowSize();
+  const [showFooter, setShowFooter] = useState(true);
   const toast = useToast();
 
   const MAX_CHARACTER_COUNT = 250;
@@ -87,11 +83,12 @@ export default function Message() {
       toast({
         title: "Anonymous user does not exist!",
         description:
-          "There's no such user with this username. Shey you de whine me?",
+          "There's no such user with this username. Please check that you used the right link",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -135,38 +132,6 @@ export default function Message() {
     setAnonymousMsg("");
   };
 
-  const provider = new GoogleAuthProvider();
-
-  const handleLinkShare = useCallback(async () => {
-    const url = `https://anon-msg-app.vercel.app/${username}`;
-
-    copyToClipboard(`Send me and anonymous message and I won't know\n${url}`);
-
-    toast({
-      title: "Link copied to clipboard!",
-      status: "success",
-      duration: 1000,
-      isClosable: true,
-    });
-
-    if (navigator.share) {
-      await navigator.share({
-        title: "Send me an anonymous message",
-        text: "Send an anonymous message 😉 to me and I won't know. 🙈",
-        url,
-      });
-    }
-  }, [username, toast]);
-
-  const handleAuth = async () => {
-    if (isSignedIn) {
-      await handleLinkShare();
-    } else {
-      const auth = getAuth();
-      signInWithRedirect(auth, provider);
-    }
-  };
-
   useEffect(() => {
     const auth = getAuth();
     getRedirectResult(auth)
@@ -185,6 +150,18 @@ export default function Message() {
         });
       });
   }, [username, toast]);
+
+  const handleTextAreaFocus = () => {
+    if (windowSize.height < 650) {
+      setShowFooter(false);
+    }
+  };
+
+  const handleTextAreaBlur = () => {
+    if (windowSize.height < 650) {
+      setShowFooter(true);
+    }
+  };
 
   return (
     <div>
@@ -232,6 +209,8 @@ export default function Message() {
             placeholder={`Write an anonymous message for ${userid}`}
             height={"200px"}
             mb={"1rem"}
+            onFocus={handleTextAreaFocus}
+            onBlur={handleTextAreaBlur}
           />
           <Flex justifyContent="space-between">
             <Text>
@@ -252,7 +231,7 @@ export default function Message() {
         </Box>
       </Flex>
 
-      <Footer />
+      {showFooter && <Footer />}
 
       <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
