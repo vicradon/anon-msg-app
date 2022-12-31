@@ -73,39 +73,6 @@ const DeleteModal = (props: Props) => {
           isClosable: true,
         });
       })
-
-    // try {
-    //   setDeleteLoading((prev) => !prev);
-
-    //   const collectionRef = collection(
-    //     db,
-    //     "anonymous-msgs",
-    //     user?.email,
-    //     "messages"
-    //   );
-
-    //   const docRef = doc(db, collectionRef.path, currId);
-
-    //   await deleteDoc(docRef);
-
-    //   setDeleteLoading(false);
-
-    //   toast({
-    //     title: "Message sent!",
-    //     description: "Your message has been sent successfully",
-    //     status: "success",
-    //     duration: 3000,
-    //     isClosable: true,
-    //   });
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "oops, something went wrong!",
-    //     status: "error",
-    //     duration: 3000,
-    //     isClosable: true,
-    //   });
-    // }
   };
 
   return (
