@@ -7,7 +7,6 @@ interface Props {}
 function ToggleThemeButton(props: Props) {
   const { colorMode, toggleColorMode } = useColorMode();
   const color = useColorModeValue('white', 'red')
-  console.log(color);
   const {} = props;
 
   return (

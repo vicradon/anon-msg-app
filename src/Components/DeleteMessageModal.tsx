@@ -8,11 +8,13 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { doc, deleteDoc, collection, query } from "firebase/firestore";
+import { deleteDoc, collection, query, doc } from "firebase/firestore";
 import { firebaseDb as db } from "../utils/firebase.config";
 import { useAuth } from "Context/AuthContext";
+import errorCodesMap from "utils/errorCodes";
 
 interface Props {
   isOpen: boolean;
@@ -22,36 +24,88 @@ interface Props {
 
 const DeleteModal = (props: Props) => {
   const { isOpen, onClose, id } = props;
-  const { isSignedIn, user, username, loading } = useAuth();
+  const { user, setDeleted } = useAuth();
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const toast = useToast();
 
-  const handleDeleteMsg = async (
+  const closeMsgModal = () => {
+    setDeleteLoading(false);
+    onClose();
+  };
+
+  const handleDeleteMsg = (
     e: React.MouseEvent<HTMLElement>,
     currId: string
   ) => {
     e.preventDefault();
+
     setDeleteLoading((prev) => !prev);
 
-    const { id: msgId } = collection(
+    const collectionRef = collection(
       db,
       "anonymous-msgs",
       user?.email,
       "messages"
     );
 
-    const docRef = doc(db, msgId, currId);
-    await deleteDoc(docRef)
-      .then(() => {
-        console.log("deleted");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+    const docRef = doc(db, collectionRef.path, currId);
 
-  const closeMsgModal = () => {
-    setDeleteLoading(false);
-    onClose();
+    deleteDoc(docRef)
+      .then(() => {
+        setDeleteLoading(false);
+        toast({
+          title: "Message deleted!",
+          description: "Your message has been deleted successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        onClose();
+        setDeleted(true);
+      })
+      .catch(() => {
+        setDeleteLoading(false);
+        toast({
+          title: "Error",
+          description: "oops, something went wrong!",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+
+    // try {
+    //   setDeleteLoading((prev) => !prev);
+
+    //   const collectionRef = collection(
+    //     db,
+    //     "anonymous-msgs",
+    //     user?.email,
+    //     "messages"
+    //   );
+
+    //   const docRef = doc(db, collectionRef.path, currId);
+
+    //   await deleteDoc(docRef);
+
+    //   setDeleteLoading(false);
+
+    //   toast({
+    //     title: "Message sent!",
+    //     description: "Your message has been sent successfully",
+    //     status: "success",
+    //     duration: 3000,
+    //     isClosable: true,
+    //   });
+    // } catch (error) {
+    //   toast({
+    //     title: "Error",
+    //     description: "oops, something went wrong!",
+    //     status: "error",
+    //     duration: 3000,
+    //     isClosable: true,
+    //   });
+    // }
   };
 
   return (
