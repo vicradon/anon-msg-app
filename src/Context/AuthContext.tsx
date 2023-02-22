@@ -16,6 +16,8 @@ type ContextProps = {
   setIsSignedIn: React.Dispatch<React.SetStateAction<any>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<any>>;
+  deleted: boolean;
+  setDeleted: React.Dispatch<React.SetStateAction<any>>;
 };
 
 const AuthContext = createContext<ContextProps>({
@@ -27,6 +29,8 @@ const AuthContext = createContext<ContextProps>({
   setIsSignedIn: null,
   loading: true,
   setLoading: null,
+  deleted: false,
+  setDeleted: null,
 });
 
 function AuthProvider(props: Props) {
@@ -35,6 +39,7 @@ function AuthProvider(props: Props) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleted, setDeleted] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -65,6 +70,8 @@ function AuthProvider(props: Props) {
         setUsername,
         loading,
         setLoading,
+        deleted,
+        setDeleted,
       }}
     >
       {children}
