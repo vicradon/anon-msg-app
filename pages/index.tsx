@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Heading, Box, useDisclosure, Grid, useToast } from "@chakra-ui/react";
 import { useAuth } from "../src/Context/AuthContext";
 import { firebaseDb } from "../src/utils/firebase.config";
@@ -14,14 +14,9 @@ import VerifyEmailView from "Components/VerifyEmailView";
 
 export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isSignedIn, user, username, loading, deleted, setDeleted } =
-    useAuth();
+  const { isSignedIn, user, username, loading } = useAuth();
   const [anonymousMsgs, setAnonymousMsgs] = useState([]);
   const toast = useToast();
-
-  const handleDeleted = useCallback(() => {
-    setDeleted((prev) => !prev);
-  }, [setDeleted]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -66,8 +61,7 @@ export default function Home() {
       }
     };
     fetchMessages();
-    handleDeleted();
-  }, [username, user?.email, toast, deleted, handleDeleted]);
+  }, [username, user?.email, toast]);
 
   return (
     <Box overflowY={loading ? "hidden" : "visible"}>
