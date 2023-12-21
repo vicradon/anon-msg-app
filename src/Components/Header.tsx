@@ -21,6 +21,8 @@ function Header(props: Props) {
   const { user, username } = useAuth();
   const toast = useToast();
 
+  const uniqueLink = `${window.location.href}${username}`;
+
   const handleCopyLink = (link) => {
     copyToClipboard(link);
     toast({
@@ -32,9 +34,9 @@ function Header(props: Props) {
   };
 
   const shareLink = async () => {
-    const url = `https://anon-msg-app.vercel.app/${username}`;
-
-    copyToClipboard(`Send me and anonymous message and I won't know\n${url}`);
+    copyToClipboard(
+      `Send me and anonymous message and I won't know\n${uniqueLink}`
+    );
 
     toast({
       title: "Link copied to clipboard!",
@@ -47,7 +49,7 @@ function Header(props: Props) {
       await navigator.share({
         title: "Send me an anonymous message",
         text: "Send an anonymous message 😉 to me and I won't know. 🙈",
-        url,
+        url: uniqueLink,
       });
     }
   };
@@ -82,14 +84,10 @@ function Header(props: Props) {
               size={"xs"}
               paddingRight={"2px"}
               leftIcon={<FaCopy fontSize={"10px"} />}
-              onClick={() =>
-                handleCopyLink(`https://anon-msg-app.vercel.app/${username}`)
-              }
+              onClick={() => handleCopyLink(uniqueLink)}
             ></Button>
 
-            <Text fontSize={{ base: "0.7rem", lg: "1rem" }}>
-              https://anon-msg-app.vercel.app/{username}
-            </Text>
+            <Text fontSize={{ base: "0.7rem", lg: "1rem" }}>{uniqueLink}</Text>
           </Flex>
         )}
       </Flex>
